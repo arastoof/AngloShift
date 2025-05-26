@@ -90,6 +90,8 @@ fn apply_case_to_replacement(original_word: &str, replacement: &str) -> String {
 fn convert_text(text: &str, mapping: &HashMap<String, String>) -> String {
     let mut converted_text = String::new();
     let mut current_word = String::new();
+    let mut conversion_list = String::new();
+    let mut conversion_count: u8 = 0;
 
     for c in text.chars() {
         if c.is_alphabetic() {
@@ -100,8 +102,13 @@ fn convert_text(text: &str, mapping: &HashMap<String, String>) -> String {
                 // Try to convert the word
                 let lowercased_word = current_word.to_lowercase(); // For case-insensitive lookup
                 if let Some(replacement) = mapping.get(&lowercased_word) {
+                    conversion_count+= 1;
+
                     // If a replacement is found, use it.
-                    converted_text.push_str(&apply_case_to_replacement(&current_word, replacement));
+                    let replacement = &apply_case_to_replacement(&current_word, replacement);
+                    converted_text.push_str(replacement);
+                    // Log the conversion
+                    conversion_list.push_str(&format!("{} -> {}", current_word, replacement));
                 } else {
                     // No replacement found, append the original word
                     converted_text.push_str(&current_word);
@@ -116,11 +123,19 @@ fn convert_text(text: &str, mapping: &HashMap<String, String>) -> String {
     if !current_word.is_empty() {
         let lowercased_word = current_word.to_lowercase();
         if let Some(replacement) = mapping.get(&lowercased_word) {
-            converted_text.push_str(&apply_case_to_replacement(&current_word, replacement));
+            conversion_count+= 1;
+
+            let replacement = &apply_case_to_replacement(&current_word, replacement);
+            converted_text.push_str(replacement);
+            conversion_list.push_str(&format!("{} -> {}", current_word, replacement));
         } else {
             converted_text.push_str(&current_word);
         }
     }
+
+    println!("{} conversion(s) were made:", conversion_count);
+    println!("{}", conversion_list);
+    println!("----------------------- Updated Text --------------------------");
 
     converted_text
 }
